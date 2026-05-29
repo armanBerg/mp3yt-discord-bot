@@ -48,10 +48,10 @@ public class SampleModule : ModuleBase<SocketCommandContext>
 public class MusicModule : ModuleBase<SocketCommandContext>
 {
 	private static Utilities _util;
-	
+
 	[Command("play")]
 	[Summary("Plays a youtube clip as mp3")]
-	public async Task PlayAsync([Summary("Paste youtube link")] string ytLink, IVoiceChannel channel = null)
+	public async Task PlayAsync([Summary("Paste youtube link")] string ytLink = "", IVoiceChannel channel = null)
 	{
 		channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
 		if (channel == null)
@@ -59,30 +59,35 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 			await Context.Channel.SendMessageAsync("User must be in a voice channel, or a voice channel must be passed as an argument.");
 			return;
 		}
-		var audioClient = await channel.ConnectAsync();
-		Console.WriteLine("Before audio");
-		SendAsync(audioClient, "C:\\Users\\lynin\\RiderProjects\\mp3yt-discord-bot\\DJ Splash This Is My Life [zyBDF2hgqcc].mp3");
-		Console.WriteLine("After audio");
-		
-		
-	}
-	
-	private async Task SendAsync(IAudioClient client, string path)
-	{
-		
-    // Create FFmpeg using the previous example
-    using (var ffmpeg = _util.CreateStream(path))
-    using (var output = ffmpeg.StandardOutput.BaseStream)
-    using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
-    {
+		_ = Task.Run(async () =>
+		{
 			try
 			{
-				Console.WriteLine("Itgs doin it");
-				await output.CopyToAsync(discord);
-				Console.WriteLine("Itgs done doin it");
+				var audioClient = await channel.ConnectAsync();
+				SendAsync(audioClient, "C:\\Users\\lynin\\RiderProjects\\mp3yt-discord-bot\\DJ Splash This Is My Life [zyBDF2hgqcc].mp3");
+			} catch (Exception ex)
+			{
+				await Context.Channel.SendMessageAsync($"Error: {ex.Message}");
 			}
-        finally { await discord.FlushAsync(); }
-    }
-}
-	
+		});
+	}
+
+	private async Task SendAsync(IAudioClient client, string path)
+	{
+		// Create FFmpeg using the previous example
+		using (var ffmpeg = _util.CreateStream(path))
+			using (var output = ffmpeg.StandardOutput.BaseStream)
+				using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
+				{
+					try
+					{
+						Console.WriteLine("Itgs doin it");
+						await output.CopyToAsync(discord);
+						Console.WriteLine("Itgs done doin it");
+					} finally
+					{
+						await discord.FlushAsync();
+					}
+				}
+	}
 }
