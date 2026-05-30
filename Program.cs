@@ -26,6 +26,7 @@ public class Program
 		_client = new DiscordSocketClient(new DiscordSocketConfig
 		{
 			EnableVoiceDaveEncryption = true,
+			GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
 		});
 		_client.Log += Log;
 
