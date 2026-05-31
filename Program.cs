@@ -14,11 +14,15 @@ public class Program
 	private static DiscordSocketClient _client;
 	private static CommandService _commands;
 
+	
+
 	private static Task Log(LogMessage msg)
 	{
 		Console.WriteLine(msg.ToString());
 		return Task.CompletedTask;
 	}
+
+	
 
 	public static async Task Main()
 	{
@@ -26,6 +30,7 @@ public class Program
 		_client = new DiscordSocketClient(new DiscordSocketConfig
 		{
 			EnableVoiceDaveEncryption = true,
+			GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
 		});
 		_client.Log += Log;
 

@@ -47,7 +47,7 @@ public class SampleModule : ModuleBase<SocketCommandContext>
 
 public class MusicModule : ModuleBase<SocketCommandContext>
 {
-	private static Utilities _util;
+	private static Utilities _util = new Utilities();
 
 	[Command("play")]
 	[Summary("Plays a youtube clip as mp3")]
@@ -64,7 +64,7 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 			try
 			{
 				var audioClient = await channel.ConnectAsync();
-				SendAsync(audioClient, "C:\\Users\\lynin\\RiderProjects\\mp3yt-discord-bot\\DJ Splash This Is My Life [zyBDF2hgqcc].mp3");
+				await SendAsync(audioClient, "cache\\test.mp3");
 			} catch (Exception ex)
 			{
 				await Context.Channel.SendMessageAsync($"Error: {ex.Message}");
@@ -77,7 +77,7 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 		// Create FFmpeg using the previous example
 		using (var ffmpeg = _util.CreateStream(path))
 			using (var output = ffmpeg.StandardOutput.BaseStream)
-				using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
+				using (var discord = client.CreatePCMStream(AudioApplication.Music))
 				{
 					try
 					{
