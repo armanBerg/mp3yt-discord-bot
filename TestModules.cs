@@ -47,7 +47,7 @@ public class SampleModule : ModuleBase<SocketCommandContext>
 
 public class MusicModule : ModuleBase<SocketCommandContext>
 {
-	Utilities _util = new Utilities();
+	private static Utilities _util = new Utilities();
 
 	[Command("play")]
 	[Summary("Plays a youtube clip as mp3")]
@@ -77,7 +77,7 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 		// Create FFmpeg using the previous example
 		using (var ffmpeg = _util.CreateStream(path))
 			using (var output = ffmpeg.StandardOutput.BaseStream)
-				using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
+				using (var discord = client.CreatePCMStream(AudioApplication.Music))
 				{
 					try
 					{
