@@ -2,48 +2,9 @@
 using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
+using System.Diagnostics;
 
 namespace mp3yt_discord_bot;
-
-// Create a module with no prefix
-public class TestModules : ModuleBase<SocketCommandContext>
-{
-	// ~say hello world -> hello world
-	[Command("say")]
-	[Summary("Echoes a message.")]
-	public Task SayAsync([Remainder] [Summary("The text to echo")] string echo) => ReplyAsync(echo);
-
-	// ReplyAsync is a method on ModuleBase 
-}
-
-// Create a module with the 'sample' prefix
-[Group("sample")]
-public class SampleModule : ModuleBase<SocketCommandContext>
-{
-	// ~sample square 20 -> 400
-	[Command("square")]
-	[Summary("Squares a number.")]
-	public async Task SquareAsync([Summary("The number to square.")] int num)
-	{
-		// We can also access the channel from the Command Context.
-		await Context.Channel.SendMessageAsync($"{num}^2 = {Math.Pow(num, 2)}");
-	}
-
-	// ~sample userinfo --> foxbot#0282
-	// ~sample userinfo @Khionu --> Khionu#8708
-	// ~sample userinfo Khionu#8708 --> Khionu#8708
-	// ~sample userinfo Khionu --> Khionu#8708
-	// ~sample userinfo 96642168176807936 --> Khionu#8708
-	// ~sample whois 96642168176807936 --> Khionu#8708
-	[Command("userinfo")]
-	[Summary("Returns info about the current user, or the user parameter, if one passed.")]
-	[Alias("user", "whois")]
-	public async Task UserInfoAsync([Summary("The (optional) user to get info from")] SocketUser user = null)
-	{
-		var userInfo = user ?? Context.Client.CurrentUser;
-		await ReplyAsync($"{userInfo.Username}#{userInfo.Discriminator}");
-	}
-}
 
 public class MusicModule : ModuleBase<SocketCommandContext>
 {
@@ -51,7 +12,7 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 
 	[Command("play")]
 	[Summary("Plays a youtube clip as mp3")]
-	public async Task PlayAsync([Summary("Paste youtube link")] string ytLink = "", IVoiceChannel channel = null)
+	public async Task PlayAsync([Summary("Paste youtube link")] string url = "", IVoiceChannel channel = null)
 	{
 		channel = channel ?? (Context.User as IGuildUser)?.VoiceChannel;
 		if (channel == null)
@@ -63,8 +24,25 @@ public class MusicModule : ModuleBase<SocketCommandContext>
 		{
 			try
 			{
+				
 				var audioClient = await channel.ConnectAsync();
-				await SendAsync(audioClient, "cache\\test.mp3");
+
+
+				//ytdlp download  
+				//TODO: implement into Utilities class
+				var process = Process.Start("yt-dlp.exe", $"-x --audio-format mp3 -o \"cache/%(id)s.%(ext)s\" {url}");
+
+				process.WaitForExit();
+
+				// foreach(char _ in url)
+				// {
+				// 	Console.WriteLine(_);
+				// }
+
+				string filename = url.Substring(43 - 11, 11);
+				Console.WriteLine($"Console: {filename}");
+
+				await SendAsync(audioClient, $"cache\\{filename}.mp3");
 			} catch (Exception ex)
 			{
 				await Context.Channel.SendMessageAsync($"Error: {ex.Message}");
