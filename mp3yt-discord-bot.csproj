@@ -12,6 +12,7 @@
         <Compile Remove="Discord.Net\**" />
     </ItemGroup>
 
+
     <ItemGroup>
       <PackageReference Include="DotNetEnv" Version="3.2.0" />
     </ItemGroup>
@@ -23,4 +24,5 @@
       <ProjectReference Include="Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
       <ProjectReference Include="Discord.Net\src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" />
     </ItemGroup>
+    
 </Project>
